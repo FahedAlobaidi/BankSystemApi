@@ -143,7 +143,7 @@ namespace BankSystemApi.TransactionsServices
             {
                 if (amount < 0)
                 {
-                    throw new Exception("Amount must be positive");
+                    throw new BadRequestException("Amount must be positive");
                 }
 
                 if (accountNumberIn == accountNumberOut) throw new BadRequestException("cant transfer to the same account number");
