@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BankSystemApi.Controllers
 {
     [Route("api/client")]
-    //[Authorize]
+    [Authorize]
     [ApiController]
     public class ClientController : ControllerBase
     {
