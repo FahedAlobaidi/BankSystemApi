@@ -69,6 +69,7 @@ namespace BankSystemApi.Controllers
         {
             bool isEmailExist = await _UserRepo.IsEmailExistAsync(loginDto.Email);
 
+            
             if (!isEmailExist)
             {
                 return Unauthorized("You write the wrong password or email");
@@ -76,7 +77,7 @@ namespace BankSystemApi.Controllers
 
             var user = await _UserRepo.GetUserWithClientInfo(loginDto.Email);
 
-            bool isPasswordValid = BCrypt.Net.BCrypt.EnhancedVerify(loginDto.PasswordHash, user.PasswordHash);
+            bool isPasswordValid = BCrypt.Net.BCrypt.EnhancedVerify(loginDto.PasswordHash, user?.PasswordHash);
 
             if (user.Client == null)
             {

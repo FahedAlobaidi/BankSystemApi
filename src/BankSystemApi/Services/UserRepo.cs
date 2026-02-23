@@ -18,9 +18,9 @@ namespace BankSystemApi.Services
             _context.users.Add(user);
         }
 
-        public Task<User> GetUser(string email)
+        public async Task<User?> GetUser(string email)
         {
-            throw new NotImplementedException();
+            return await _context.users.Where(u => u.Email == email).FirstOrDefaultAsync();
         }
 
         public async Task<User?> GetUserWithClientInfo(string email)

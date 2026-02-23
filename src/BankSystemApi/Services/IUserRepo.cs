@@ -8,7 +8,7 @@ namespace BankSystemApi.Services
 
         Task<bool> IsEmailExistAsync(string email);
 
-        Task<User> GetUser(string email);
+        Task<User?> GetUser(string email);
 
         Task<User?> GetUserWithClientInfo(string email);
 
