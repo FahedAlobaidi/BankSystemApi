@@ -26,7 +26,7 @@ namespace BankSystemApi.TransactionsServices
             _context = context;
         }
 
-        public async Task<IEnumerable<TransactionDto>> GetTransactions(string accountNumber)
+        public async Task<IEnumerable<TransactionDto>> GetTransactions(Guid clientId,string accountNumber)
         {
             var accountEnt = await _accountRepo.GetAccountByAccountNumber(accountNumber);
 
@@ -35,12 +35,17 @@ namespace BankSystemApi.TransactionsServices
                 throw new NotFoundException($"there are no account with this number {accountNumber}");
             }
 
+            if(accountEnt.ClientId!= clientId)
+            {
+                throw new BadRequestException("You don`t have this account number");
+            }
+
             var transactions = await _transactionRepo.GetTransactionsAsync(accountEnt.Id);
 
             return _mapper.Map<IEnumerable<TransactionDto>>(transactions);
         }
 
-        public async Task<TransactionDto> MakeDeposit(string accountNumber, decimal amount)
+        public async Task<TransactionDto> MakeDeposit(Guid clientId,string accountNumber, decimal amount)
         {
             using var transactionDb = await _context.Database.BeginTransactionAsync();
 
@@ -48,7 +53,7 @@ namespace BankSystemApi.TransactionsServices
             {
 
 
-                if (amount < 0)
+                if (amount <= 0)
                 {
                      throw new BadRequestException("Amount must be positive");
                 }
@@ -58,6 +63,11 @@ namespace BankSystemApi.TransactionsServices
                 if (accountEnt == null)
                 {
                     throw new NotFoundException("The account with this id is not exist");
+                }
+
+                if(accountEnt.ClientId!= clientId)
+                {
+                    throw new BadRequestException("You don`t have this account number");
                 }
 
                 accountEnt.AccountBalance = accountEnt.AccountBalance + amount;
@@ -87,7 +97,7 @@ namespace BankSystemApi.TransactionsServices
             }
         }
 
-        public async Task<TransactionDto> Withdrawal(string accountNumber, decimal amount)
+        public async Task<TransactionDto> Withdrawal(Guid clientId,string accountNumber, decimal amount)
         {
 
             using var transactionDb = await _context.Database.BeginTransactionAsync();
@@ -100,6 +110,11 @@ namespace BankSystemApi.TransactionsServices
                 if (account == null)
                 {
                     throw new NotFoundException("Wrong account number");
+                }
+
+                if (account.ClientId != clientId)
+                {
+                    throw new BadRequestException("You don`t have this account number");
                 }
 
                 if (account.AccountBalance < amount)
@@ -135,13 +150,13 @@ namespace BankSystemApi.TransactionsServices
             
         }
 
-        public async Task<IEnumerable<TransactionDto>> Transfer(string accountNumberIn, decimal amount, string accountNumberOut)
+        public async Task<IEnumerable<TransactionDto>> Transfer(Guid clientId,string accountNumberIn, decimal amount, string accountNumberOut)
         {
             using var transactionDb = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                if (amount < 0)
+                if (amount <= 0)
                 {
                     throw new BadRequestException("Amount must be positive");
                 }
@@ -162,6 +177,11 @@ namespace BankSystemApi.TransactionsServices
                 if (senderAccountEnt == null)
                 {
                     throw new NotFoundException($"The account with this {accountNumberOut} is not exist");
+                }
+
+                if (senderAccountEnt.ClientId != clientId)
+                {
+                    throw new BadRequestException("You don`t have this account number");
                 }
 
                 if (amount > senderAccountEnt.AccountBalance)

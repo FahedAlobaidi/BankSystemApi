@@ -11,8 +11,5 @@ namespace BankSystemApi.Models
 
         
         public string Currency { get; set; }
-
-        [Required]
-        public Guid ClientId { get; set; }
     }
 }

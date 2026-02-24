@@ -77,9 +77,20 @@ namespace BankSystemApi.Controllers
         [HttpPost("createAccount")]
         public async Task<IActionResult> CreateAccount(AccountCreateDto accountCreateDto)
         {
+            var clientIdString = User.FindFirst("sub_client")?.Value;
+
+            if (string.IsNullOrEmpty(clientIdString))
+            {
+                return BadRequest();
+            }
+
+            var clientId = Guid.Parse(clientIdString);
+
             var accountEnt = _mapper.Map<Account>(accountCreateDto);
 
             accountEnt.AccountNumber = await GenerateAccountNumberAsync();
+
+            accountEnt.ClientId = clientId;
 
             _accountRepo.AddAccount(accountEnt);
 
