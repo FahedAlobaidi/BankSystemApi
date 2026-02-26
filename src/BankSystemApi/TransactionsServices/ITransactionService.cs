@@ -4,12 +4,12 @@ namespace BankSystemApi.TransactionsServices
 {
     public interface ITransactionService
     {
-        Task<IEnumerable<TransactionDto>> GetTransactions(string accountNumber);
+        Task<IEnumerable<TransactionDto>> GetTransactions(Guid clientId,string accountNumber);
 
-        Task<TransactionDto> MakeDeposit(string accountNumber, decimal amount);
+        Task<TransactionDto> MakeDeposit(Guid clientId,string accountNumber, decimal amount);
 
-        Task<IEnumerable<TransactionDto>> Transfer(string accountNumberIn, decimal amount, string accountNumberOut);
+        Task<IEnumerable<TransactionDto>> Transfer(Guid clientId,string accountNumberIn, decimal amount, string accountNumberOut);
 
-        Task<TransactionDto> Withdrawal(string accountNumber,decimal amount);
+        Task<TransactionDto> Withdrawal(Guid clientId,string accountNumber,decimal amount);
     }
 }

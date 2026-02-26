@@ -21,10 +21,19 @@ namespace BankSystemApi.Controllers
         [HttpPost("deposit")]
         public async Task<ActionResult<TransactionDto>> MakeDeposit([FromBody] DepositDto depositDto)
         {
+            var clientIdString = User.FindFirst("sub_client")?.Value;
+
+            if (string.IsNullOrEmpty(clientIdString))
+            {
+                return BadRequest("Token is invalid: No Client ID found.");
+            }
+
+            var clientId = Guid.Parse(clientIdString);
+
             var amount = depositDto.Amount;
             var accountNum = depositDto.AccountNumber;
 
-            var transactionDto = await _transactionService.MakeDeposit(accountNum, amount);
+            var transactionDto = await _transactionService.MakeDeposit(clientId,accountNum, amount);
 
             return Ok(transactionDto);
         }
@@ -32,7 +41,17 @@ namespace BankSystemApi.Controllers
         [HttpPost("withdrawal")]
         public async Task<ActionResult<TransactionDto>> Withdrawal(DepositDto withdrawal)
         {
-            var transactionDto = await _transactionService.Withdrawal(withdrawal.AccountNumber, withdrawal.Amount);
+            var clientIdString = User.FindFirst("sub_client")?.Value;
+
+            if (string.IsNullOrEmpty(clientIdString))
+            {
+                return BadRequest("Token is invalid: No Client ID found.");
+            }
+
+
+            var clientId = Guid.Parse(clientIdString);
+
+            var transactionDto = await _transactionService.Withdrawal(clientId,withdrawal.AccountNumber, withdrawal.Amount);
 
             return Ok(transactionDto);
         }
@@ -40,7 +59,16 @@ namespace BankSystemApi.Controllers
         [HttpPost("transfer")]
         public async Task<ActionResult<IEnumerable<TransactionDto>>> Transfer([FromBody] TransferDto transferDto)
         {
-            var transferTransactions = await _transactionService.Transfer(transferDto.AccountNumberIn, transferDto.Amount, transferDto.AccountNumberOut);
+            var clientIdString = User.FindFirst("sub_client")?.Value;
+
+            if (string.IsNullOrEmpty(clientIdString))
+            {
+                return BadRequest("Token is invalid: No Client ID found.");
+            }
+
+            var clientId = Guid.Parse(clientIdString);
+
+            var transferTransactions = await _transactionService.Transfer(clientId,transferDto.AccountNumberIn, transferDto.Amount, transferDto.AccountNumberOut);
 
             return Ok(transferTransactions);
         }
@@ -48,7 +76,16 @@ namespace BankSystemApi.Controllers
         [HttpGet("{accountNumber}")]
         public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions(string accountNumber)
         {
-            var transactions = await _transactionService.GetTransactions(accountNumber);
+            var clientIdString = User.FindFirst("sub_client")?.Value;
+
+            if (string.IsNullOrEmpty(clientIdString))
+            {
+                return BadRequest("Token is invalid: No Client ID found.");
+            }
+
+            var clientId = Guid.Parse(clientIdString);
+
+            var transactions = await _transactionService.GetTransactions(clientId,accountNumber);
 
             return  Ok(transactions);
         }

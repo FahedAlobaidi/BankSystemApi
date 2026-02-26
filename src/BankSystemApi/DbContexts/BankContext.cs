@@ -50,6 +50,10 @@ namespace BankSystemApi.DbContexts
                .Property(t => t.TransactionType)
                .HasConversion<string>();
 
+            modelBuilder.Entity<Account>()
+                .Property(acc => acc.Status)
+                .HasConversion<string>();
+
             Guid userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
             Guid clientId = Guid.Parse("22222222-2222-2222-2222-222222222222");
             Guid accountId = Guid.Parse("33333333-3333-3333-3333-333333333333");
@@ -84,7 +88,7 @@ namespace BankSystemApi.DbContexts
                     AccountNumber="121233445",
                     AccountBalance = 10000,
                     ClientId =clientId,
-                    Status="Active",
+                    Status=Account.StatusTypes.Active,
                     Currency="JOD",
                 }
                 );

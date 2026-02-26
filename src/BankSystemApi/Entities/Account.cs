@@ -21,7 +21,7 @@ namespace BankSystemApi.Entities
         
         public string Currency { get; set; } = "JOD";
 
-        public string Status { get; set; } = "Active";
+        public StatusTypes Status { get; set; }
 
         // ← FOREIGN KEY (Points to Client table)
         // Example: ClientId = aaaa-bbbb-cccc-dddd
@@ -39,5 +39,12 @@ namespace BankSystemApi.Entities
         public Client? Client { get; set; }
 
         public ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
+
+        public enum StatusTypes
+        {
+            Active,
+            Frozen,
+            Closed
+        }
     }
 }
