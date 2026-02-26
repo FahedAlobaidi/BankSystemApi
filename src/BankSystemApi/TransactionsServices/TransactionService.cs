@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using BankSystemApi.DbContexts;
+using BankSystemApi.Entities;
 using BankSystemApi.Exceptions;
 using BankSystemApi.Models;
 using BankSystemApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.IIS;
+using System.Security.Principal;
 using System.Transactions;
 
 namespace BankSystemApi.TransactionsServices
@@ -70,6 +72,11 @@ namespace BankSystemApi.TransactionsServices
                     throw new BadRequestException("You don`t have this account number");
                 }
 
+                if (accountEnt.Status == Account.StatusTypes.Closed)
+                {
+                    throw new BadRequestException("Your account is closed so you cant make this transaction");
+                }
+
                 accountEnt.AccountBalance = accountEnt.AccountBalance + amount;
 
                 var transaction = new Entities.Transaction
@@ -116,6 +123,8 @@ namespace BankSystemApi.TransactionsServices
                 {
                     throw new BadRequestException("You don`t have this account number");
                 }
+
+                if (account.Status == Account.StatusTypes.Closed || account.Status == Account.StatusTypes.Frozen) throw new BadRequestException("Your account is closed or frozen so you cant make this transaction");
 
                 if (account.AccountBalance < amount)
                 {
@@ -183,6 +192,7 @@ namespace BankSystemApi.TransactionsServices
                 {
                     throw new BadRequestException("You don`t have this account number");
                 }
+                if (senderAccountEnt.Status == Account.StatusTypes.Closed || senderAccountEnt.Status == Account.StatusTypes.Frozen) throw new BadRequestException("Your account is closed or frozen so you cant make this transaction");
 
                 if (amount > senderAccountEnt.AccountBalance)
                 {
