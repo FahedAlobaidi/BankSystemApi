@@ -1,4 +1,4 @@
-using BankSystemApi.DbContexts;
+﻿using BankSystemApi.DbContexts;
 using BankSystemApi.Middleware;
 
 //using BankSystemApi.Middleware;
@@ -106,7 +106,13 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("MustBeAdmin", policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("role", "Admin");
+        /*
+         Your DefaultInboundClaimTypeMap.Clear() is supposed to prevent this mapping, but clearly it's not working — role is still being converted to that long Microsoft URI.
+         So your policy checks for "role" but the actual claim type in your running app is "http://schemas.microsoft.com/ws/2008/06/identity/claims/role". They don't match → Forbidden.
+         Instead of fighting with DefaultInboundClaimTypeMap, the cleanest fix is to update your policy to use RequireRole which handles this automatically
+         */
+        //policy.RequireClaim("role", "Admin");
+        policy.RequireRole("Admin");
     });
 });
 

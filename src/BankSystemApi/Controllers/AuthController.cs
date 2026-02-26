@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BankSystemApi.Entities;
+using BankSystemApi.Exceptions;
 using BankSystemApi.Models;
 using BankSystemApi.Services;
 using BankSystemApi.TokenService;
@@ -35,7 +36,10 @@ namespace BankSystemApi.Controllers
         {
             if(await _UserRepo.IsEmailExistAsync(registerationDto.Email))
             {
-                return BadRequest("The email is already exist");
+                //this will return plain text and i dont need that i am already added exception handler
+                //return BadRequest("The email is already exist");
+
+                throw new BadRequestException("The email is already exist");
             }
 
             var userEnt = _mapper.Map<User>(registerationDto);
@@ -72,7 +76,8 @@ namespace BankSystemApi.Controllers
             
             if (!isEmailExist)
             {
-                return Unauthorized("You write the wrong password or email");
+                //return Unauthorized("You write the wrong password or email");
+                throw new UnauthorizedException("You write the wrong password or email");
             }
 
             var user = await _UserRepo.GetUserWithClientInfo(loginDto.Email);
@@ -87,7 +92,8 @@ namespace BankSystemApi.Controllers
             
             if (!isPasswordValid)
             {
-                return Unauthorized("You write the wrong password or email");
+                //return Unauthorized("You write the wrong password or email");
+                throw new BadRequestException("You write the wrong password or email");
             }
 
             var returnedToken = _tokenService.CreateToken(user);
